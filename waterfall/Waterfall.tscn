@@ -1,0 +1,201 @@
+[gd_scene load_steps=19 format=2]
+
+[ext_resource path="res://waterfall/displacement.png" type="Texture" id=1]
+[ext_resource path="res://waterfall/noise.png" type="Texture" id=2]
+
+[sub_resource type="CylinderMesh" id=1]
+height = 8.0
+
+[sub_resource type="Shader" id=2]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform sampler2D noise_tex;
+uniform sampler2D displacement_tex;
+
+uniform vec4 top_bright_color : hint_color;
+uniform vec4 top_dark_color : hint_color;
+uniform vec4 bot_bright_color : hint_color;
+uniform vec4 bot_dark_color : hint_color;
+
+uniform float displ_amount = 0.02;
+uniform float bottom_float_threshold = 0.58;
+uniform float speed = 0.25;
+
+void fragment()
+{
+	vec2 displ = texture(displacement_tex, UV - TIME*speed/4.0).rg;
+	displ = ((displ*2.0)-1.0)*displ_amount;
+	
+	
+	float noise = texture(noise_tex, vec2(UV.x, UV.y/3.0 - TIME*speed) + displ).r;
+	noise = ceil(noise*5.)/5.;
+	
+	vec4 col = mix(mix(top_dark_color, bot_dark_color, UV.y), mix(top_bright_color, bot_bright_color, UV.y), noise);
+	col = mix(vec4(1,1,1,1), col, step(UV.y + displ.y, bottom_float_threshold));
+	ALBEDO = col.rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = SubResource( 2 )
+shader_param/top_bright_color = Color( 0.368627, 0.811765, 0.913725, 1 )
+shader_param/top_dark_color = Color( 0.133333, 0.243137, 0.270588, 1 )
+shader_param/bot_bright_color = Color( 0.670588, 0.87451, 0.921569, 1 )
+shader_param/bot_dark_color = Color( 0.184314, 0.219608, 0.227451, 1 )
+shader_param/displ_amount = 0.02
+shader_param/bottom_float_threshold = 0.469
+shader_param/speed = 0.25
+shader_param/noise_tex = ExtResource( 2 )
+shader_param/displacement_tex = ExtResource( 1 )
+
+[sub_resource type="Shader" id=4]
+code = "shader_type spatial;
+render_mode unshaded, cull_disabled;
+
+uniform sampler2D dissolve_tex : hint_white;
+uniform vec4 front_color : hint_color;
+uniform vec4 back_color : hint_color;
+
+void fragment()
+{
+	float a = COLOR.r - texture(dissolve_tex, UV).x;
+	ALPHA = step(0.0, a);
+	ALPHA_SCISSOR = 0.01;
+	ALBEDO = front_color.rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = SubResource( 4 )
+shader_param/front_color = Color( 1, 1, 1, 1 )
+shader_param/back_color = Color( 0.635294, 0.854902, 0.905882, 1 )
+shader_param/dissolve_tex = ExtResource( 2 )
+
+[sub_resource type="Gradient" id=6]
+colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
+
+[sub_resource type="GradientTexture" id=7]
+gradient = SubResource( 6 )
+
+[sub_resource type="Curve" id=8]
+_data = [ Vector2( 0.0253165, 0.501136 ), 0.0, 0.0, 0, 0, Vector2( 0.335443, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=9]
+curve = SubResource( 8 )
+
+[sub_resource type="ParticlesMaterial" id=10]
+emission_shape = 2
+emission_box_extents = Vector3( 1.5, 0.2, 1.5 )
+direction = Vector3( 0, 1, 0 )
+spread = 15.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 2.5
+scale = 0.7
+scale_curve = SubResource( 9 )
+color_ramp = SubResource( 7 )
+
+[sub_resource type="SphereMesh" id=11]
+
+[sub_resource type="Shader" id=15]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform vec4 main_color : hint_color;
+uniform vec4 intersection_color : hint_color;
+uniform float intersection_max_threshold = 0.8;
+uniform sampler2D displ_tex : hint_white;
+uniform float displ_amount = 1.0;
+uniform float near = 0.15;
+uniform float far = 300;
+
+float linearize(float c_depth)
+{
+	c_depth = 2.0*c_depth - 1.0;
+	return near*far/(far + c_depth * (near -far));
+}
+
+void fragment()
+{
+	float z_depth = linearize(texture(DEPTH_TEXTURE, SCREEN_UV).x);
+	float z_pos = linearize(FRAGCOORD.z);
+	float diff = z_depth - z_pos;
+	
+	vec2 displ = texture(displ_tex, UV - TIME /7.0).rg;
+	displ = (2.0*displ - 1.0)*displ_amount;
+	diff += displ.x;
+	
+	vec4 color = mix(intersection_color, main_color, step(intersection_max_threshold, diff));
+	
+	ALBEDO = color.rgb;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=16]
+shader = SubResource( 15 )
+shader_param/main_color = Color( 0.109804, 0.815686, 0.8, 1 )
+shader_param/intersection_color = Color( 1, 1, 1, 1 )
+shader_param/intersection_max_threshold = 0.8
+shader_param/displ_amount = 1.0
+shader_param/near = 0.15
+shader_param/far = 300.0
+shader_param/displ_tex = ExtResource( 1 )
+
+[sub_resource type="PlaneMesh" id=12]
+material = SubResource( 16 )
+size = Vector2( 14, 14 )
+
+[sub_resource type="CubeMesh" id=13]
+size = Vector3( 16, 2, 2 )
+
+[sub_resource type="Environment" id=14]
+background_mode = 1
+background_color = Color( 0.988235, 0.470588, 0.615686, 1 )
+ambient_light_color = Color( 0.580392, 0.796078, 0.729412, 1 )
+
+[node name="Waterfall-root" type="Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.438978, 0.295975 )
+
+[node name="Waterfall" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.682785, 4.00078, 0 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 3 )
+
+[node name="Particles" type="Particles" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.682785, 0, 0 )
+material_override = SubResource( 5 )
+amount = 17
+lifetime = 0.3
+visibility_aabb = AABB( -4.11964, -4, -4, 8.23927, 8, 8 )
+process_material = SubResource( 10 )
+draw_pass_1 = SubResource( 11 )
+
+[node name="water" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.10321, 0.266643, -0.40736 )
+mesh = SubResource( 12 )
+material/0 = null
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.137, 0, -7.546 )
+mesh = SubResource( 13 )
+material/0 = null
+
+[node name="MeshInstance2" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.14, 0, 6.638 )
+mesh = SubResource( 13 )
+material/0 = null
+
+[node name="MeshInstance3" type="MeshInstance" parent="."]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 5.866, 0, -0.386 )
+mesh = SubResource( 13 )
+material/0 = null
+
+[node name="MeshInstance4" type="MeshInstance" parent="."]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -8.10242, 0, -0.386 )
+mesh = SubResource( 13 )
+material/0 = null
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( -0.0398637, -0.27317, 0.961139, -0.0113201, 0.961966, 0.272936, -0.999141, 9.30523e-10, -0.0414399, 10.7586, 2.42442, -2.38419e-07 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( -2.73409e-08, -0.397949, 0.917408, -1.18598e-08, 0.917408, 0.397949, -1, 0, -2.98023e-08, 9.56723, 5.3932, -0.320504 )
+environment = SubResource( 14 )
