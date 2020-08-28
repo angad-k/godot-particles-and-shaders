@@ -9,6 +9,7 @@
 code = "shader_type canvas_item; 
 
 uniform vec4 ice_color : hint_color;
+uniform vec4 bg_color : hint_color;
 uniform sampler2D normal;
 
 void fragment() {
@@ -16,24 +17,24 @@ void fragment() {
 	vec2 offset = texture(normal, UV).rg * 2.0 - 1.0;
 	vec2 suv = SCREEN_UV;
 	suv += offset * 0.03;
-	//vec4 c = textureLod(SCREEN_TEXTURE, vec2(suv.x/1.2 + 0.05 , suv.y/1.2 + 0.05), 0.0);
-	vec4 c = textureLod(SCREEN_TEXTURE, vec2(suv.x + 0.01 , suv.y -  0.05), 0.0);
+	vec4 c = textureLod(SCREEN_TEXTURE, vec2(suv.x + 0.007 , suv.y -  0.05), 0.0);
 	c.a = 0.5;
-	vec3 actual = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0).rgb;
 	
-    //c.rgb = mix(vec3(0.0), c.rgb, brightness);
-    //c.rgb = mix(vec3(0.5), c.rgb, contrast);
-    //c.rgb = mix(vec3(dot(vec3(1.0), c.rgb) * 0.33333), c.rgb, saturation);
 	COLOR.rgb = ice_color.rgb;
 	COLOR.b -= offset.g * 0.3;
 	COLOR.rgb = COLOR.rgb * (1.0 - c.a) + c.rgb * c.a;
-	//COLOR.rgb += actual;
+	
+	vec4 actual = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0);
+	
+	COLOR.rgb = mix(COLOR.rgb, actual.rgb, step(0.1 , abs(actual.r - bg_color.r) + abs(actual.g - bg_color.g) + abs(actual.b - bg_color.b)) );
+	//COLOR.rgb += actual.rgb;
 }"
 custom_defines = ""
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
 shader_param/ice_color = Color( 0.317647, 0.686275, 0.909804, 1 )
+shader_param/bg_color = Color( 0.298039, 0.298039, 0.298039, 1 )
 shader_param/normal = ExtResource( 4 )
 
 [node name="Ice" type="Node2D"]
@@ -46,11 +47,6 @@ texture = ExtResource( 2 )
 
 [node name="iceblock" type="Sprite" parent="."]
 material = SubResource( 2 )
-position = Vector2( 570.257, 305.449 )
+position = Vector2( 529.432, 280.211 )
 scale = Vector2( 7.58725, 5.41767 )
 texture = ExtResource( 1 )
-
-[node name="person2" type="Sprite" parent="."]
-position = Vector2( 494.725, 293.96 )
-scale = Vector2( 0.25, 0.25 )
-texture = ExtResource( 2 )

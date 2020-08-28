@@ -12,7 +12,7 @@ curve = SubResource( 1 )
 offsets = PoolRealArray( 0, 0.451852, 0.985185 )
 colors = PoolColorArray( 1, 1, 1, 1, 0.913725, 0.964706, 0.0588235, 0.941176, 0.9375, 0.0622559, 0.0622559, 0.937255 )
 
-[sub_resource type="GradientTexture" id=10]
+[sub_resource type="GradientTexture" id=4]
 gradient = SubResource( 3 )
 
 [sub_resource type="Curve" id=5]
@@ -44,7 +44,7 @@ orbit_velocity_random = 0.0
 linear_accel_curve = SubResource( 6 )
 scale = 10.0
 scale_curve = SubResource( 8 )
-color_ramp = SubResource( 10 )
+color_ramp = SubResource( 4 )
 
 [node name="Fire" type="Node2D"]
 position = Vector2( 587, 290 )

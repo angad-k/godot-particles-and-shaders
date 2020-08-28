@@ -23,7 +23,6 @@ func _process(delta):
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * speed
 	$person.position += velocity * delta
-	$person2.position += velocity * delta
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
