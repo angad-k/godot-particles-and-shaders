@@ -2,7 +2,6 @@
 
 [ext_resource path="res://Smoke/smokeparts.png" type="Texture" id=1]
 
-
 [sub_resource type="Curve" id=1]
 min_value = -360.0
 max_value = 360.0

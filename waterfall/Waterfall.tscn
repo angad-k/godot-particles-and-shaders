@@ -152,7 +152,7 @@ background_color = Color( 0.988235, 0.470588, 0.615686, 1 )
 ambient_light_color = Color( 0.580392, 0.796078, 0.729412, 1 )
 
 [node name="Waterfall-root" type="Spatial"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.438978, 0.295975 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.821285, 0.295975 )
 
 [node name="Waterfall" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.682785, 4.00078, 0 )

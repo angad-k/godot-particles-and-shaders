@@ -26,7 +26,7 @@ _data = [ Vector2( 0, 90.9091 ), 0.0, 0.0, 0, 0, Vector2( 0.443038, 123.636 ), -
 curve = SubResource( 5 )
 
 [sub_resource type="Curve" id=7]
-_data = [ Vector2( 0.00632912, 0.723864 ), 0.0, 0.807954, 0, 0, Vector2( 0.968354, 0.478409 ), 0.0, 0.0, 0, 0 ]
+_data = [ Vector2( 0.00632912, 0.723864 ), 0.0, 0.807954, 0, 0, Vector2( 0.803797, 0.555682 ), -1.77835, -1.77835, 0, 0, Vector2( 0.987342, 0.246591 ), 0.0, 0.0, 0, 0 ]
 
 [sub_resource type="CurveTexture" id=8]
 curve = SubResource( 7 )
@@ -35,7 +35,7 @@ curve = SubResource( 7 )
 emission_shape = 2
 emission_box_extents = Vector3( 25, 25, 1 )
 flag_disable_z = true
-spread = 15.0
+spread = 0.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 80.0
 angular_velocity = 314.48
