@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/person.png-5c1a192947341e1316a10f4844fe7ebc.stex"
+path="res://.import/person-potoba.png-f15f37ced20ff889ba6c93877cabb789.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ICe/person.png"
-dest_files=[ "res://.import/person.png-5c1a192947341e1316a10f4844fe7ebc.stex" ]
+source_file="res://demo-person/assets/person-potoba.png"
+dest_files=[ "res://.import/person-potoba.png-f15f37ced20ff889ba6c93877cabb789.stex" ]
 
 [params]
 
